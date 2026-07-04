@@ -6,6 +6,43 @@ The **Employee Management System** is a web-based application developed using **
 
 ---
 
+## 🚀 Quick Start & URL Links
+
+To run and access the application locally:
+
+### 1. Installation & Setup
+First, install the required packages and seed the database with sample data:
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run database migrations
+python manage.py migrate
+
+# Seed dummy/sample data
+python seed_data.py
+```
+
+### 2. Run the Server
+You can run the server using the provided startup script:
+```bash
+# Double-click run_server.bat, or run:
+python manage.py runserver
+```
+
+### 3. URL Links & Credentials
+Once the server is running, use these links to interact with the system:
+
+* **User Portal (Login):** [http://127.0.0.1:8000/login/](http://127.0.0.1:8000/login/)
+* **Django Admin Panel:** [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/)
+
+#### Default Credentials
+* **Username:** `admin`
+* **Password:** `admin123`
+
+---
+
+
 # Features
 
 * Secure Login System
