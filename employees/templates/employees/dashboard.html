@@ -1,0 +1,135 @@
+{% extends 'employees/base.html' %}
+{% block title %}Dashboard - EMS{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><i class="bi bi-speedometer2 me-2"></i>Dashboard</h1>
+</div>
+
+<!-- Stats Row 1 -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-4 col-md-6">
+        <div class="stat-card stat-blue">
+            <div class="stat-info">
+                <p class="stat-label">Total Employees</p>
+                <h2 class="stat-value">{{ total_employees }}</h2>
+                <a href="{% url 'employee_list' %}" class="stat-link">View Details <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <div class="stat-icon-box">
+                <i class="bi bi-people-fill"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-6">
+        <div class="stat-card stat-green">
+            <div class="stat-info">
+                <p class="stat-label">Active Employees</p>
+                <h2 class="stat-value">{{ active_employees }}</h2>
+                <a href="{% url 'employee_list' %}?status=Active" class="stat-link">View Details <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <div class="stat-icon-box">
+                <i class="bi bi-person-check-fill"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-6">
+        <div class="stat-card stat-red">
+            <div class="stat-info">
+                <p class="stat-label">Inactive Employees</p>
+                <h2 class="stat-value">{{ inactive_employees }}</h2>
+                <a href="{% url 'employee_list' %}?status=Inactive" class="stat-link">View Details <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <div class="stat-icon-box">
+                <i class="bi bi-person-x-fill"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-6">
+        <div class="stat-card stat-purple">
+            <div class="stat-info">
+                <p class="stat-label">Male Employees</p>
+                <h2 class="stat-value">{{ male_employees }}</h2>
+                <a href="{% url 'employee_list' %}" class="stat-link">View Details <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <div class="stat-icon-box">
+                <i class="bi bi-gender-male"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-6">
+        <div class="stat-card stat-orange">
+            <div class="stat-info">
+                <p class="stat-label">Female Employees</p>
+                <h2 class="stat-value">{{ female_employees }}</h2>
+                <a href="{% url 'employee_list' %}" class="stat-link">View Details <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <div class="stat-icon-box">
+                <i class="bi bi-gender-female"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-6">
+        <div class="stat-card stat-teal">
+            <div class="stat-info">
+                <p class="stat-label">Recently Added</p>
+                <h2 class="stat-value">{{ recent_employees|length }}</h2>
+                <a href="{% url 'employee_add' %}" class="stat-link">Add New <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <div class="stat-icon-box">
+                <i class="bi bi-person-plus-fill"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recently Added Employees Table -->
+<div class="content-card">
+    <div class="card-header-custom">
+        <h5 class="card-title-custom"><i class="bi bi-clock-history me-2"></i>Recently Added Employees</h5>
+        <a href="{% url 'employee_add' %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-lg me-1"></i>Add Employee
+        </a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover custom-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Designation</th>
+                    <th>Joining Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in recent_employees %}
+                <tr>
+                    <td><span class="emp-id-badge">{{ emp.employee_id }}</span></td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="emp-avatar">
+                                {% if emp.profile_photo %}
+                                    <img src="{{ emp.profile_photo.url }}" alt="{{ emp.full_name }}">
+                                {% else %}
+                                    <span>{{ emp.first_name|slice:":1"|upper }}</span>
+                                {% endif %}
+                            </div>
+                            <a href="{% url 'employee_detail' emp.pk %}" class="text-decoration-none fw-semibold emp-name-link">{{ emp.full_name }}</a>
+                        </div>
+                    </td>
+                    <td>{{ emp.department.name|default:"—" }}</td>
+                    <td>{{ emp.designation }}</td>
+                    <td>{{ emp.joining_date|date:"d M Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-5 text-muted">
+                        <i class="bi bi-inbox display-6 d-block mb-2"></i>No employees found. <a href="{% url 'employee_add' %}">Add one now!</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

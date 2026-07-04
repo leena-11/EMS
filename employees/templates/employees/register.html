@@ -1,0 +1,99 @@
+{% extends 'employees/base.html' %}
+{% block title %}Register - EMS{% endblock %}
+
+{% block auth_content %}
+<div class="login-page">
+    <div class="login-left">
+        <div class="login-illustration">
+            <div class="illustration-circle c1"></div>
+            <div class="illustration-circle c2"></div>
+            <div class="illustration-circle c3"></div>
+            <div class="illus-content">
+                <i class="bi bi-person-plus-fill illus-icon"></i>
+                <h2>Join EMS Today</h2>
+                <p>Create your account to start managing employees with ease.</p>
+            </div>
+        </div>
+    </div>
+    <div class="login-right">
+        <div class="login-card">
+            <div class="login-logo">
+                <i class="bi bi-people-fill"></i>
+                <span>EMS</span>
+            </div>
+            <h3 class="login-title">Create Account</h3>
+            <p class="login-subtitle">Fill in your details to register</p>
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show">
+                {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <form method="post" action="{% url 'register' %}">
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="form-label fw-semibold">First Name</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}<div class="text-danger small">{{ form.first_name.errors|join:", " }}</div>{% endif %}
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-semibold">Last Name</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}<div class="text-danger small">{{ form.last_name.errors|join:", " }}</div>{% endif %}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            {{ form.username }}
+                        </div>
+                        {% if form.username.errors %}<div class="text-danger small">{{ form.username.errors|join:", " }}</div>{% endif %}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            {{ form.email }}
+                        </div>
+                        {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors|join:", " }}</div>{% endif %}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            {{ form.password1 }}
+                        </div>
+                        {% if form.password1.errors %}<div class="text-danger small">{{ form.password1.errors|join:", " }}</div>{% endif %}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Confirm Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                            {{ form.password2 }}
+                        </div>
+                        {% if form.password2.errors %}<div class="text-danger small">{{ form.password2.errors|join:", " }}</div>{% endif %}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Admin Registration Code</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-shield-lock-fill"></i></span>
+                            {{ form.admin_code }}
+                        </div>
+                        {% if form.admin_code.errors %}<div class="text-danger small">{{ form.admin_code.errors|join:", " }}</div>{% endif %}
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 btn-login mt-4">
+                    <i class="bi bi-person-check me-2"></i>Register
+                </button>
+            </form>
+            <p class="text-center mt-3 mb-0">
+                Already have an account? <a href="{% url 'login' %}" class="text-primary fw-semibold">Login Here</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

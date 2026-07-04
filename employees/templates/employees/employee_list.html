@@ -1,0 +1,192 @@
+{% extends 'employees/base.html' %}
+{% block title %}Employees - EMS{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><i class="bi bi-person-lines-fill me-2"></i>Employees</h1>
+    <a href="{% url 'employee_add' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Add Employee
+    </a>
+</div>
+
+<!-- Filters -->
+<div class="content-card mb-4">
+    <form method="get" action="{% url 'employee_list' %}" id="filterForm">
+        <div class="row g-3 align-items-end">
+            <div class="col-lg-4 col-md-6">
+                <label class="form-label fw-semibold small">Search</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="q" class="form-control" placeholder="Search employees..." value="{{ query }}">
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label fw-semibold small">Department</label>
+                <select name="department" class="form-select">
+                    <option value="">All Departments</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept.id }}" {% if department_filter == dept.id|stringformat:"s" %}selected{% endif %}>{{ dept.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <label class="form-label fw-semibold small">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="Active" {% if status_filter == 'Active' %}selected{% endif %}>Active</option>
+                    <option value="Inactive" {% if status_filter == 'Inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+            <div class="col-lg-3 col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-fill">
+                    <i class="bi bi-funnel me-1"></i>Search
+                </button>
+                <a href="{% url 'employee_list' %}" class="btn btn-outline-secondary flex-fill">
+                    <i class="bi bi-x-circle me-1"></i>Clear
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Table -->
+<div class="content-card">
+    <div class="card-header-custom">
+        <h6 class="mb-0 text-muted">Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }} entries</h6>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover custom-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Photo</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                    <th>Designation</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in page_obj %}
+                <tr>
+                    <td><span class="emp-id-badge">{{ emp.employee_id }}</span></td>
+                    <td>
+                        <div class="emp-avatar">
+                            {% if emp.profile_photo %}
+                                <img src="{{ emp.profile_photo.url }}" alt="{{ emp.full_name }}">
+                            {% else %}
+                                <span>{{ emp.first_name|slice:":1"|upper }}</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td class="fw-semibold">{{ emp.full_name }}</td>
+                    <td class="text-muted">{{ emp.email }}</td>
+                    <td>
+                        {% if emp.department %}
+                        <span class="dept-badge">{{ emp.department.name }}</span>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>{{ emp.designation }}</td>
+                    <td>
+                        {% if emp.status == 'Active' %}
+                        <span class="status-badge status-active">Active</span>
+                        {% else %}
+                        <span class="status-badge status-inactive">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                            <a href="{% url 'employee_detail' emp.pk %}" class="btn btn-sm btn-icon btn-view" title="View">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{% url 'employee_edit' emp.pk %}" class="btn btn-sm btn-icon btn-edit" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button class="btn btn-sm btn-icon btn-delete" title="Delete"
+                                onclick="confirmDelete('{{ emp.full_name }}', '{% url 'employee_delete' emp.pk %}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center py-5">
+                        <i class="bi bi-search display-5 text-muted d-block mb-3"></i>
+                        <p class="text-muted mb-2">No employees found.</p>
+                        <a href="{% url 'employee_add' %}" class="btn btn-primary btn-sm">Add First Employee</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination-wrapper">
+        <nav>
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ query }}&department={{ department_filter }}&status={{ status_filter }}">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}&q={{ query }}&department={{ department_filter }}&status={{ status_filter }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ query }}&department={{ department_filter }}&status={{ status_filter }}">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="deleteEmployeeName"></strong>? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger"><i class="bi bi-trash me-1"></i>Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmDelete(name, url) {
+    document.getElementById('deleteEmployeeName').textContent = name;
+    document.getElementById('deleteForm').action = url;
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+{% endblock %}
